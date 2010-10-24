@@ -16,9 +16,9 @@ describe MiniSQL do
 
   it 'can run SQL & get table list' do
     @db.tables.should == []
-    @db.sql 'create table tbl (id int);'
+    @db.execute 'create table tbl (id int);'
     @db.tables.should == [:tbl]
-    @db.sql 'drop table tbl;'
+    @db.execute 'drop table tbl;'
     @db.tables.should == []
   end
 

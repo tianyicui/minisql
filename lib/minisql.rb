@@ -14,7 +14,12 @@ class MiniSQL
   #   column[:co3].float
   #   primary_key :co2
   # end
-  def create_table name, &schema
+  def create_table name, &block
+    require 'schema'
+    schema = Schema.new(name)
+    schema.instance_eval(block)
+    command = schema.dump
+    execute command
   end
 
   def drop_table name
@@ -36,14 +41,14 @@ class MiniSQL
   def select columns
   end
 
-  def sql command, &block
+  def execute command, &block
     @db.execute command, &block
   end
 
   def tables
     # FIXME: use self#select
     result = []
-    sql 'select name from sqlite_master' do |row|
+    execute 'select name from sqlite_master' do |row|
       result << row[0].to_sym
     end
     result
