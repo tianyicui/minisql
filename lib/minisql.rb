@@ -36,8 +36,17 @@ class MiniSQL
   def select columns
   end
 
-  def sql command
-    @db.execute command
+  def sql command, &block
+    @db.execute command, &block
+  end
+
+  def tables
+    # FIXME: use self#select
+    result = []
+    sql 'select name from sqlite_master' do |row|
+      result << row[0].to_sym
+    end
+    result
   end
 
   def close

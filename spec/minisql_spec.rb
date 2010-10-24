@@ -14,9 +14,22 @@ describe MiniSQL do
   it 'can be initialized and closed' do
   end
 
-  it 'can run SQL' do
+  it 'can run SQL & get table list' do
+    @db.tables.should == []
     @db.sql 'create table tbl (id int);'
+    @db.tables.should == [:tbl]
     @db.sql 'drop table tbl;'
+    @db.tables.should == []
+  end
+
+  it 'can create table' do
+    @db.create_table :tbl do
+      column[:int_col].int
+      column[:float_col].float
+      column[:char_col].char(16).unique
+      primary_key :int_col
+    end
+    @db.tables.should include :tbl
   end
 
   def db_file
