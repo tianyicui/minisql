@@ -1,6 +1,9 @@
 class MiniSQL
 
+  require 'sqlite3'
+
   def initialize file_name
+    @db = SQLite3::Database.new file_name
   end
 
   # Idea:
