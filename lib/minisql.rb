@@ -37,6 +37,11 @@ class MiniSQL
   end
 
   def sql command
+    @db.execute command
+  end
+
+  def close
+    @db.close
   end
 
 end
