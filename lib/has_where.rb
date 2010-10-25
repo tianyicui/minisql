@@ -1,16 +1,7 @@
-class BaseSelector
+module HasWhere
 
-  def initialize db
-    @db = db
-    @from = nil
+  def self.included base
     @where = nil
-    @result_set = nil
-  end
-
- def from table, &block
-    raise 'more than one from clause' unless @from.nil?
-    @from = table
-    block_given? ? self.each(&block) : self
   end
 
   def where &block
@@ -19,18 +10,6 @@ class BaseSelector
     @where.instance_eval &block
     self
   end
-
-  def dump
-    raise 'missing from clause' if @from.nil?
-    raise NotImplementedError, 'virtual method'
-  end
-
-  def each &block
-    @result_set = @db.execute dump if @result_set.nil?
-    @result_set.each &block
-  end
-
-  include Enumerable
 
   class Where
 

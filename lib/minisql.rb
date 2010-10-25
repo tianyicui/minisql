@@ -20,7 +20,7 @@ class MiniSQL
     schema.instance_eval(&block)
     command = schema.dump
     execute command
-    return command # return the DDL
+    command # return the DDL
   end
 
   def drop_table table

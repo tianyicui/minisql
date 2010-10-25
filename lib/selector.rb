@@ -1,10 +1,20 @@
-require 'base_selector'
+require 'has_where'
 
-class Selector < BaseSelector
+class Selector
+
+  include HasWhere
 
   def initialize db
-    super db
+    @db = db
+    @from = nil
     @columns = []
+    @result_set = nil
+  end
+
+  def from table, &block
+    raise 'more than one from clause' unless @from.nil?
+    @from = table
+    block_given? ? self.each(&block) : self
   end
 
   def [] *columns
@@ -13,9 +23,14 @@ class Selector < BaseSelector
     self
   end
 
+  include Enumerable
+  def each &block
+    @result_set = @db.execute dump if @result_set.nil?
+    @result_set.each &block
+  end
+
   def dump
-    super
-  rescue NotImplementedError
+    raise 'missing from clause' if @from.nil?
     raise 'columns not defined' if @columns.empty?
     sql = 'SELECT ' + @columns.join(', ') + " FROM #{@from}"
     sql += ' ' + @where.dump unless @where.nil?
