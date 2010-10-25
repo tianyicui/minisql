@@ -23,12 +23,20 @@ describe MiniSQL do
   end
 
   it 'can create table' do
-    @db.create_table :tbl do
+    ddl = @db.create_table :tbl do
       column[:int_col].int
       column[:float_col].float
       column[:char_col].char(16).unique
       primary_key :int_col
     end
+    ddl.split.should == <<-EOF.split
+    CREATE TABLE tbl (
+      int_col INT,
+      float_col FLOAT,
+      char_col CHAR(16) UNIQUE,
+      PRIMARY KEY ( int_col )
+    );
+    EOF
     @db.tables.should include :tbl
   end
 

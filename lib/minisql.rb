@@ -20,15 +20,19 @@ class MiniSQL
     schema.instance_eval(&block)
     command = schema.dump
     execute command
+    return command # return the DDL
   end
 
-  def drop_table name
+  def drop_table table
+    execute "DROP TABLE #{table};"
   end
 
   def create_index name, table, column
+    execute "CREATE INDEX #{name} ON #{table} ( #{column} );"
   end
 
   def drop_index name
+    execute "DROP INDEX #{name}"
   end
 
   # Idea:
@@ -39,6 +43,12 @@ class MiniSQL
   #   column[:co3] > ...
   # end
   def select columns
+  end
+
+  def insert_into
+  end
+
+  def delete_from
   end
 
   def execute command, &block

@@ -26,21 +26,23 @@ class Schema
     end
 
     def int
-      type 'int'
+      type 'INT'
       self
     end
 
     def char num
-      type "char(#{num.to_i})"
+      type "CHAR(#{num.to_i})"
       self
     end
 
     def float
-      type 'float'
+      type 'FLOAT'
       self
     end
 
     def dump
+      raise 'column has no name' if @name.nil?
+      raise "column #{@name} has no type" if @type.nil?
       "#{@name} #{@type}#{@unique ? ' UNIQUE':''}"
     end
 
@@ -65,6 +67,9 @@ class Schema
   end
 
   def dump
+    raise 'table has no name' if @name.nil?
+    raise "table #{@name} has no column" if @columns.empty?
+    raise "table #{@name} doesn't set primary key" if @pk.nil?
     sql = "CREATE TABLE #{@name} ( "
     @columns.each do |c|
       sql += c.dump+", "
