@@ -37,12 +37,20 @@ class MiniSQL
 
   # Idea:
   #
-  # select('*').from(:table).where do
-  #   column[:co1] = ...
+  # rows = select['*'].from(:table)
+  #
+  # or
+  #
+  # rows = select['*'].from(:table).where do
+  #   column[:co1] == ...
   #   column[:co2] < ...
-  #   column[:co3] > ...
+  #   column[:co3] >= ...
   # end
-  def select columns
+  #
+  # rows.each ... # no sql are executed until here
+  def select
+    require 'selector'
+    Selector.new self
   end
 
   def insert_into
@@ -56,9 +64,8 @@ class MiniSQL
   end
 
   def tables
-    # FIXME: use self#select
     result = []
-    execute 'select name from sqlite_master' do |row|
+    select[:name].from(:sqlite_master) do |row|
       result << row[0].to_sym
     end
     result
