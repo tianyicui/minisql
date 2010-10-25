@@ -1,14 +1,14 @@
 require 'minisql'
-require 'fileutils'
 
 describe MiniSQL do
 
   before :each do
-    @db = MiniSQL.new db_file
+    @db = MiniSQL::MiniSQL.new db_file
   end
 
   after :each do
     @db.close
+    require 'fileutils'
     FileUtils.rm db_file
   end
 
