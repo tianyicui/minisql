@@ -28,6 +28,14 @@ describe MiniSQL do
     create_sample_table
   end
 
+  it 'can drop table' do
+    create_sample_table
+    @db.eval do
+      drop_table :tbl
+      tables.should == []
+    end
+  end
+
   #XXX: why rspec don't let me use @db.eval and 'should include' in the same time?
   it 'can select * from table' do
     create_sample_table
@@ -54,6 +62,14 @@ describe MiniSQL do
       column[:type] == 'table'
       column[:name] == 'tbl'
     end.to_a.should == [['table', 'tbl']]
+  end
+
+  it 'can create and drop index on table' do
+    create_sample_table
+    @db.eval do
+      create_index :char_index, :tbl, :char_col
+      drop_index :char_index
+    end
   end
 
   def create_sample_table
