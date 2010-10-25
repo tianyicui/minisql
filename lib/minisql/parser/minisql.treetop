@@ -1,0 +1,61 @@
+grammar MiniSQL
+
+  rule expression
+    create_table_exp /
+    drop_table_exp
+  end
+
+
+  rule create_table_exp
+    _ CREATE __ TABLE __ name _ '(' _
+      (
+       _ name __ type _ (UNIQUE)? _ ',' _
+      )+
+      _ PRIMARY __ KEY _ '(' _ name _ ')' _
+    ')' _ ';' _
+  end
+
+  rule drop_table_exp
+    _ DROP __ TABLE __ name _ ';' _
+  end
+
+  rule __
+    white+
+  end
+
+  rule _
+    white*
+  end
+
+  rule white
+    [ \n\r\t]
+  end
+
+  rule type
+    INT / FLOAT / char_type
+  end
+
+  rule char_type
+    _ CHAR _ '(' _ number _ ')' _
+  end
+
+  rule name
+    [a-zA-Z] [0-9a-zA-Z]*
+  end
+
+  rule number
+    [1-9] [0-9]*
+  end
+
+
+  rule CHAR 'char' / 'CHAR' end
+  rule CREATE 'create' / 'CREATE' end
+  rule DROP 'drop' / 'DROP' end
+  rule FLOAT 'float' / 'FLOAT' end
+  rule INT 'int' / 'INT' end
+  rule KEY 'key' / 'KEY' end
+  rule PRIMARY 'primary' / 'PRIMARY' end
+  rule TABLE 'table' / 'TABLE' end
+  rule UNIQUE 'unique' / 'UNIQUE' end
+
+end
