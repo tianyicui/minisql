@@ -1,11 +1,13 @@
 require 'yaml'
+require 'fileutils'
 
 module MiniSQL
 
   class Catalog
 
-    def initialize file_name
-      @root = (Pathname(file_name) + 'catalog').real_path
+    def initialize filename
+      @root = Pathname(filename) + 'catalog'
+      FileUtils.mkdir_p @root
       @table_catalog = EntityCatalog.new 'table', @root + 'tables'
       @index_catalog = EntityCatalog.new 'index', @root + 'indexes'
     end
@@ -13,6 +15,7 @@ module MiniSQL
     class EntityCatalog
       def initialize kind, path
         @kind=kind
+        FileUtils.mkdir_p path
         @path=path
       end
 
@@ -36,7 +39,6 @@ module MiniSQL
 
       def delete name
         file = entity_file(name)
-        require 'fileutils'
         FileUtils.rm file
       end
 

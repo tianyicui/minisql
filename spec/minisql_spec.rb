@@ -9,7 +9,7 @@ describe MiniSQL do
   after :each do
     @db.close
     require 'fileutils'
-    FileUtils.rm db_file
+    FileUtils.rm_rf db_file
   end
 
   it 'can be initialized and closed' do

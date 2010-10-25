@@ -5,9 +5,9 @@ module MiniSQL
     require 'sqlite3'
     require 'minisql/catalog'
 
-    def initialize file_name
-      @db = SQLite3::Database.new file_name+'.sqlite'
-      @catalog = Catalog.new file_name
+    def initialize filename
+      @catalog = Catalog.new filename
+      @sqlite = SQLite3::Database.new filename+'/.sqlite'
     end
 
     # create_table :table do
@@ -72,7 +72,7 @@ module MiniSQL
 
     def execute command, &block
       puts command if @verbose
-      @db.execute command, &block
+      @sqlite.execute command, &block
     end
 
     def tables
@@ -90,7 +90,7 @@ module MiniSQL
     end
 
     def close
-      @db.close
+      @sqlite.close
     end
 
     attr_accessor :verbose
