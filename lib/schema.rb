@@ -1,19 +1,22 @@
 class Schema
 
-  def initalize name
+  def initialize name
     @name = name
     @columns = []
   end
 
-  attr_reader :name, :columns, :pk
-
   class Column
 
-    attr_reader :name, :type, :unique
+    def initialize
+      @name = nil
+      @unique = nil
+      @type = nil
+    end
 
     def [] name
       raise 'named again' unless @name.nil?
       @name=name
+      self
     end
 
     def unique
@@ -23,28 +26,29 @@ class Schema
     end
 
     def int
-      type='int'
+      type 'int'
       self
     end
 
     def char num
-      type="char#{num.to_i}"
+      type "char(#{num.to_i})"
       self
     end
 
     def float
-      type='float'
+      type 'float'
       self
     end
 
     def dump
+      "#{@name} #{@type}#{@unique ? ' UNIQUE':''}"
     end
 
-    private
+    protected
 
-    def type= type
+    def type t
       raise 'column type defined again' unless @type.nil?
-      @type=type
+      @type=t
     end
 
   end
@@ -52,6 +56,7 @@ class Schema
   def column
     col = Column.new
     @columns << col
+    col
   end
 
   def primary_key pk
@@ -60,8 +65,13 @@ class Schema
   end
 
   def dump
-    # XXX
-    ''
+    sql = "CREATE TABLE #{@name} ( "
+    @columns.each do |c|
+      sql += c.dump+", "
+    end
+    sql += "PRIMARY KEY ( #{@pk} )"
+    sql += " );"
+    sql
   end
 
 end

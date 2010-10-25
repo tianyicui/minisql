@@ -17,7 +17,7 @@ class MiniSQL
   def create_table name, &block
     require 'schema'
     schema = Schema.new(name)
-    schema.instance_eval(block)
+    schema.instance_eval(&block)
     command = schema.dump
     execute command
   end
