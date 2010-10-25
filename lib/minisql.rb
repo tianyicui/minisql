@@ -54,7 +54,7 @@ class MiniSQL
   end
 
   def insert_into table, values
-    execute "INSERT INTO #{table} ( #{values.map{|v| v.inspect}.join(', ')} );"
+    execute "INSERT INTO #{table} VALUES ( #{values.map{|v| v.inspect}.join(', ')} );"
   end
 
   def delete_from

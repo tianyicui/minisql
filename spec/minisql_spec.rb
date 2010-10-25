@@ -25,7 +25,7 @@ describe MiniSQL do
   end
 
   it 'can create table' do
-    create_sample_table
+    validate_sample_table create_sample_table
   end
 
   it 'can drop table' do
@@ -72,14 +72,29 @@ describe MiniSQL do
     end
   end
 
+  it 'can insert values into table' do
+    create_sample_table
+    data = sample_data
+    @db.eval do
+      insert_into :tbl, data
+      select['*'].from(:tbl).where do
+        column[:int_col] == data[0]
+        column[:float_col] == data[1]
+        column[:char_col] == data[2]
+      end.to_a.should == [data]
+    end
+  end
+
   def create_sample_table
-    ddl = @db.create_table :tbl do
+    @db.create_table :tbl do
       column[:int_col].int
       column[:float_col].float
       column[:char_col].char(16).unique
       primary_key :int_col
     end
+  end
 
+  def validate_sample_table ddl
     ddl.split.should == <<-EOF.split
     CREATE TABLE tbl (
       int_col INT,
@@ -89,6 +104,10 @@ describe MiniSQL do
     );
     EOF
     @db.tables.should include :tbl
+  end
+
+  def sample_data
+    [42, 2.17, 'resolution']
   end
 
   def db_file
