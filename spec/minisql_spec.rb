@@ -3,7 +3,7 @@ require 'minisql'
 describe MiniSQL do
 
   before :each do
-    @db = MiniSQL::MiniSQL.new db_file
+    @db = MiniSQL::Database.new db_file
   end
 
   after :each do

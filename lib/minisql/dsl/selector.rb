@@ -1,8 +1,8 @@
-module MiniSQL
+module MiniSQL::DSL
 
   class Selector
 
-    require 'minisql/has_where'
+    require 'minisql/dsl/has_where'
     include HasWhere
 
     def initialize db

@@ -1,4 +1,4 @@
-module MiniSQL
+module MiniSQL::DSL
 
   module HasWhere
 
