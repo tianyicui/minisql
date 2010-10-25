@@ -15,20 +15,55 @@ describe MiniSQL do
   end
 
   it 'can run SQL & get table list' do
-    @db.tables.should == []
-    @db.execute 'create table tbl (id int);'
-    @db.tables.should == [:tbl]
-    @db.execute 'drop table tbl;'
-    @db.tables.should == []
+    @db.eval do
+      tables.should == []
+      execute 'create table tbl (id int);'
+      tables.should == [:tbl]
+      execute 'drop table tbl;'
+      tables.should == []
+    end
   end
 
   it 'can create table' do
+    create_sample_table
+  end
+
+  #XXX: why rspec don't let me use @db.eval and 'should include' in the same time?
+  it 'can select * from table' do
+    create_sample_table
+    @db.select['*'].from(:tbl).to_a.should == []
+    @db.select['*'].from(@db.meta_table).to_a[0].should include('tbl')
+  end
+
+  it 'can select columns from table' do
+    create_sample_table
+    @db.select[:int_col, :float_col].from(:tbl).to_a.should == []
+    @db.select[:type, :name].from(@db.meta_table).to_a.should include(['table', 'tbl'])
+  end
+
+  it 'can select from table where ...' do
+    create_sample_table
+
+    @db.select['*'].from(:tbl).where do
+      column[:int_col] < 0
+      column[:float_col] > 1
+      column[:char_col] != 'abc'
+    end.to_a.should == []
+
+    @db.select[:type, :name].from(@db.meta_table).where do
+      column[:type] == 'table'
+      column[:name] == 'tbl'
+    end.to_a.should == [['table', 'tbl']]
+  end
+
+  def create_sample_table
     ddl = @db.create_table :tbl do
       column[:int_col].int
       column[:float_col].float
       column[:char_col].char(16).unique
       primary_key :int_col
     end
+
     ddl.split.should == <<-EOF.split
     CREATE TABLE tbl (
       int_col INT,
@@ -43,4 +78,5 @@ describe MiniSQL do
   def db_file
     '/tmp/database.db'
   end
+
 end

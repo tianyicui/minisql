@@ -23,7 +23,7 @@ class Selector
   def where &block
     raise 'more than one where clause' unless @where.nil?
     @where = Where.new
-    @where.instance_eval(block)
+    @where.instance_eval &block
     self
   end
 
@@ -100,7 +100,7 @@ class Selector
       def dump
         raise 'column has no name' if @name.nil?
         raise "column #{@name} has no comparison operator" if @op.nil?
-        "#{@name} #{@op} #{@rval}"
+        "#{@name} #{@op} #{@rval.inspect}"
       end
 
       protected

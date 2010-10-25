@@ -60,19 +60,35 @@ class MiniSQL
   end
 
   def execute command, &block
+    puts command if @verbose
     @db.execute command, &block
   end
 
   def tables
     result = []
-    select[:name].from(:sqlite_master) do |row|
+    select[:name].from(meta_table) do |row|
       result << row[0].to_sym
     end
     result
   end
 
+  def meta_table
+    :sqlite_master
+  end
+
   def close
     @db.close
+  end
+
+  attr_accessor :verbose
+
+  def verbose!
+    @verbose=true
+  end
+
+  def eval &block
+    require 'rspec'
+    instance_eval &block
   end
 
 end
