@@ -3,9 +3,11 @@ module MiniSQL
   class Database
 
     require 'sqlite3'
+    require 'minisql/catalog'
 
     def initialize file_name
-      @db = SQLite3::Database.new file_name
+      @db = SQLite3::Database.new file_name+'.sqlite'
+      @catalog = Catalog.new file_name
     end
 
     # create_table :table do
