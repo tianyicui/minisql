@@ -57,7 +57,17 @@ class MiniSQL
     execute "INSERT INTO #{table} VALUES ( #{values.map{|v| v.inspect}.join(', ')} );"
   end
 
-  def delete_from
+  # delete_from(:tbl)
+  #
+  # OR
+  #
+  # delete_from(:tbl) do
+  #   column[:co1] == ...
+  #   ...
+  # end
+  def delete_from table, &block
+    require 'deletor'
+    Deletor.new self, table, &block
   end
 
   def execute command, &block
@@ -67,7 +77,9 @@ class MiniSQL
 
   def tables
     result = []
-    select[:name].from(meta_table) do |row|
+    select[:name].from(meta_table).where do
+      column[:type] == 'table'
+    end.each do |row|
       result << row[0].to_sym
     end
     result

@@ -2,6 +2,7 @@ require 'minisql'
 require 'fileutils'
 
 describe MiniSQL do
+
   before :each do
     @db = MiniSQL.new db_file
   end
@@ -14,7 +15,7 @@ describe MiniSQL do
   it 'can be initialized and closed' do
   end
 
-  it 'can run SQL & get table list' do
+  it 'can run SQL' do
     @db.eval do
       tables.should == []
       execute 'create table tbl (id int);'
@@ -25,7 +26,12 @@ describe MiniSQL do
   end
 
   it 'can create table' do
-    validate_sample_table create_sample_table
+    create_sample_table
+  end
+
+  it 'can get table list' do
+    insert_sample_data
+    @db.tables.should == [:tbl]
   end
 
   it 'can drop table' do
@@ -73,28 +79,34 @@ describe MiniSQL do
   end
 
   it 'can insert values into table' do
-    create_sample_table
-    data = sample_data
+    insert_sample_data
+  end
+
+  it 'can delete all data from table' do
+    insert_sample_data
     @db.eval do
-      insert_into :tbl, data
-      select['*'].from(:tbl).where do
-        column[:int_col] == data[0]
-        column[:float_col] == data[1]
-        column[:char_col] == data[2]
-      end.to_a.should == [data]
+      delete_from :tbl
+      select['*'].from(:tbl).to_a.should == []
     end
   end
 
+  it 'can delete specified data from table' do
+    insert_sample_data
+    insert_sample_data [0, 1.0, 'another one']
+    @db.delete_from :tbl do
+      column[:int_col] < 1
+    end
+    @db.select['*'].from(:tbl).to_a.should == [sample_data]
+  end
+
   def create_sample_table
-    @db.create_table :tbl do
+    ddl = @db.create_table :tbl do
       column[:int_col].int
       column[:float_col].float
       column[:char_col].char(16).unique
       primary_key :int_col
     end
-  end
 
-  def validate_sample_table ddl
     ddl.split.should == <<-EOF.split
     CREATE TABLE tbl (
       int_col INT,
@@ -104,6 +116,19 @@ describe MiniSQL do
     );
     EOF
     @db.tables.should include :tbl
+  end
+
+  def insert_sample_data data=nil
+    create_sample_table unless @db.tables.include? :tbl
+    data = sample_data if data.nil?
+    @db.eval do
+      insert_into :tbl, data
+      select['*'].from(:tbl).where do
+        column[:int_col] == data[0]
+        column[:float_col] == data[1]
+        column[:char_col] == data[2]
+      end.to_a.should == [data]
+    end
   end
 
   def sample_data
