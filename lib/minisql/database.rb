@@ -74,14 +74,13 @@ module MiniSQL
 
     def execute command, &block
       puts command if @verbose
-      @sqlite.execute command, &block
       begin
         ir = @parser.parse(command).compile
       rescue
         puts command
-        fail
       end
-      @catalog.execute ir
+      @catalog.execute ir unless ir.nil?
+      @sqlite.execute command, &block
     end
 
     def tables

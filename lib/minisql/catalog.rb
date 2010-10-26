@@ -26,9 +26,9 @@ module MiniSQL
 
       def create info
         raise "#{kind} info does not specify #{kind} name" unless info[:name]
-        name = info[:name]
+        name = info[:name].to_s
         file = entity_file(name, false)
-        IO.open(file, 'w') do |io|
+        File.open(file, 'w') do |io|
           io << info.to_yaml
         end
       end
@@ -39,7 +39,7 @@ module MiniSQL
       end
 
       def delete name
-        file = entity_file(name)
+        file = entity_file(name.to_s)
         FileUtils.rm file
       end
 

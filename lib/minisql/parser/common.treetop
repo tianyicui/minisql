@@ -18,7 +18,8 @@ grammar Common do
   end
 
   rule string_literal do
-    "'" string:(!"'" . )* "'" {
+    (( "'" string:(!"'" . )* "'" ) / 
+     ( '"' string:(!'"' . )* '"' )) {
       def compile
         string.text_value
       end
@@ -26,7 +27,7 @@ grammar Common do
   end
 
   rule name_seq do
-    head:name _? tail:(',' _? name)* {
+    head:name tail:(_? ',' _? name)* {
       def compile
         [ head.compile, *tail.elements.map{|e| e.name.compile} ]
       end

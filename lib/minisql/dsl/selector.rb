@@ -25,6 +25,7 @@ module MiniSQL::DSL
     end
 
     include Enumerable
+
     def each &block
       @result_set = @db.execute dump if @result_set.nil?
       @result_set.each &block

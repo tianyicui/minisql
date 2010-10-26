@@ -18,7 +18,7 @@ describe MiniSQL::Database do
   it 'can run SQL' do
     @db.eval do
       tables.should == []
-      execute 'create table tbl (id int);'
+      execute 'create table tbl (id int, primary key (id) );'
       tables.should == [:tbl]
       execute 'drop table tbl;'
       tables.should == []

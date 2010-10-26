@@ -113,6 +113,14 @@ describe MiniSQL::SQLParser do
       ]
   end
 
+  it 'can parse regression test 1' do
+    compile('SELECT name FROM sqlite_master WHERE type = "table" ;')
+  end
+
+  it 'can parse regression test 2' do
+    compile('CREATE TABLE tbl ( int_col INT, float_col FLOAT, char_col CHAR(16) UNIQUE, PRIMARY KEY ( int_col ) );')
+  end
+
   def compile str
     parsed = @parser.parse(str)
     parsed.should_not == nil
