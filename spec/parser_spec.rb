@@ -62,12 +62,12 @@ describe MiniSQL::SQLParser do
 
   it 'can parse WHERE clause' do
     @parser.root='where_clause'
-    compile('WHERE col0=1').should == Set.new([ [ :'==', :col0, 1] ])
+    compile("WHERE col0<>'hello'").should == Set.new([ [ :'!=', :col0, 'hello'] ])
   end
 
   it 'can parse WHERE clause with AND' do
     @parser.root='where_clause'
-    compile("WHERE col0=1 AND col1<>'hello' AND col2<0.3 AND col3>=6")
+    compile('WHERE col0>1 AND col1<=3.14')
   end
 
   it 'can parse SELECT .. FROM .. WHRER' do

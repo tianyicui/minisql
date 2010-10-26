@@ -130,7 +130,7 @@ grammar SQL do
   end
 
   rule where_clause do
-    WHERE _ head:where_condition tail:(AND _ where:where_condition)* {
+    WHERE _ head:where_condition tail:( _ AND _ where:where_condition )* {
       def compile
         Set.new [ head.compile, *tail.elements.map{|e| e.where.compile} ]
       end
