@@ -55,7 +55,7 @@ grammar CreateTableExp
   end
 
   rule char_type do
-    _? CHAR _? '(' _? number _? ')' _? {
+    CHAR _? '(' _? number _? ')' {
       def compile
         { :type => :char, :length => number.compile }
       end

@@ -36,7 +36,7 @@ module MiniSQL
     end
 
     def drop_index name
-      execute "DROP INDEX #{name}"
+      execute "DROP INDEX #{name};"
     end
 
     # rows = select['*'].from(:table)
@@ -74,11 +74,7 @@ module MiniSQL
 
     def execute command, &block
       puts command if @verbose
-      begin
-        ir = @parser.parse(command).compile
-      rescue
-        puts command
-      end
+      ir = @parser.parse(command).compile
       @catalog.execute ir unless ir.nil?
       @sqlite.execute command, &block
     end
