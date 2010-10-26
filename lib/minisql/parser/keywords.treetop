@@ -5,6 +5,7 @@ grammar Keywords do
   rule AND do 'and' / 'AND' end
   rule CHAR do 'char' / 'CHAR' end
   rule CREATE do 'create' / 'CREATE' end
+  rule DELETE do 'delete' / 'DELETE' end
   rule DROP do 'drop' / 'DROP' end
   rule FLOAT do 'float' / 'FLOAT' end
   rule FROM  do 'from' / 'FROM' end

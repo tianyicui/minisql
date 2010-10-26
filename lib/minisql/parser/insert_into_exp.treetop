@@ -1,0 +1,31 @@
+module MiniSQL
+
+grammar InsertIntoExp
+
+  include Common
+
+  rule insert_into_exp do
+    _? INSERT _ INTO _ name _ VALUES _? '(' _? value_list _? ')' _? ';' _? {
+      def compile
+        [ :insert_into,
+          { :table => name.compile,
+            :values => value_list.compile
+          }
+        ]
+      end
+    }
+  end
+
+  rule value_list do
+    value tail:( _? ',' _? value )* {
+      def compile
+        [ value.compile, *tail.elements.map {|e| e.value.compile} ]
+      end
+    }
+  end
+
+end
+
+end
+
+# vim: filetype=ruby

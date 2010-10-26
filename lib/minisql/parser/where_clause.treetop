@@ -1,0 +1,49 @@
+module MiniSQL
+
+grammar WhereClause do
+
+  include Common
+
+  rule optional_where_clause_and_semicolon do
+    where:(_ where_clause)? _? ';' {
+      def compile
+        where.text_value.empty? ? {} : {:where => where.where_clause.compile}
+      end
+    }
+  end
+
+  rule where_clause do
+    WHERE _ head:where_condition
+    tail:( _ AND _ cond:where_condition )* {
+      def compile
+        require 'set'
+        Set.new [ head.compile, *tail.elements.map{|e| e.cond.compile} ]
+      end
+    }
+  end
+
+  rule where_condition do
+    name _? where_op _? value {
+      def compile
+        [ where_op.compile, name.compile, value.compile ]
+      end
+    }
+  end
+
+  rule where_op do
+    ( '=' / ( '<' ('='/'>')? ) / ('>' '='?) ) {
+      def compile
+        case text_value
+        when '=' then :'=='
+        when '<>' then :'!='
+        else text_value.to_sym
+        end
+      end
+    }
+  end
+
+end
+
+end
+
+# vim: filetype=ruby

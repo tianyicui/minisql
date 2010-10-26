@@ -94,14 +94,29 @@ describe MiniSQL::SQLParser do
       ]
   end
 
-  def compile str, verbose=false
+  it 'can parse DELETE FROM' do
+    compile('DELETE FROM the_table ;').should ==
+      [ :delete_from,
+        { :table => :the_table }
+      ]
+  end
+
+  it 'can parse DELETE FROM .. WHERE' do
+    compile("DELETE FROM the_table WHERE language<>'lisp' AND language<>'dialect of lisp';").should ==
+      [ :delete_from,
+        { :table => :the_table,
+          :where => Set.new([
+            [ :'!=', :language, 'lisp' ],
+            [ :'!=', :language, 'dialect of lisp' ]
+          ])
+        }
+      ]
+  end
+
+  def compile str
     parsed = @parser.parse(str)
     parsed.should_not == nil
-    if verbose
-      puts '==='
-      print parsed.inspect
-      puts '==='
-    end
     parsed.compile
   end
+
 end

@@ -1,27 +1,18 @@
 module MiniSQL
 
-grammar SelectExp do
+grammar DeleteFromExp do
 
   include Common
   include WhereClause
 
-  rule select_exp do
-    _? SELECT _ columns:(star / name_seq) _ FROM _ name
+  rule delete_from_exp do
+    _? DELETE _ FROM _ name
     where:optional_where_clause_and_semicolon _? {
       def compile
-        [ :select,
+        [ :delete_from,
           { :table => name.compile,
-            :columns => columns.compile,
           }.merge!(where.compile)
         ]
-      end
-    }
-  end
-
-  rule star do
-    '*' {
-      def compile
-        :*
       end
     }
   end
