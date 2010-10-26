@@ -13,6 +13,7 @@ module MiniSQL
     end
 
     class EntityCatalog
+
       def initialize kind, path
         @kind=kind
         FileUtils.mkdir_p path
@@ -82,6 +83,11 @@ module MiniSQL
 
     def drop_index name
       @index_catalog.delete name
+    end
+
+    def execute info
+      command = info.first
+      send(command, info[1]) if respond_to? command
     end
 
   end

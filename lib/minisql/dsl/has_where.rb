@@ -72,7 +72,8 @@ module MiniSQL::DSL
         def dump
           raise 'column has no name' if @name.nil?
           raise "column #{@name} has no comparison operator" if @op.nil?
-          "#{@name} #{@op} #{@rval.inspect}"
+          sql_literal = lambda { |v| v.is_a?(String) ? "'#{v}'" : v.to_s }
+          "#{@name} #{@op} #{sql_literal(@rval)}"
         end
 
         protected
