@@ -3,7 +3,7 @@ module MiniSQL
 grammar SQL do
 
   rule expression do
-      create_table_exp / drop_table_exp / create_index_exp / drop_index_exp
+      create_table_exp / drop_table_exp / create_index_exp / drop_index_exp / select_exp
   end
 
 ######
@@ -104,6 +104,36 @@ grammar SQL do
 
 ######
 
+  rule select_exp do
+    _? SELECT _ columns:(star / name_seq) _ FROM _ name _? ';' _? {
+      def compile
+        [ :select,
+          { :table => name.compile,
+            :columns => columns.compile
+          }
+        ]
+      end
+    }
+  end
+
+  rule star do
+    '*' {
+      def compile
+        :*
+      end
+    }
+  end
+
+######
+
+  rule name_seq do
+    head:name _? tail:(',' _? name)* {
+      def compile
+        [ head.compile, *tail.elements.map{|e| e.name.compile} ]
+      end
+    }
+  end
+
   rule name do
     [a-zA-Z_] [0-9a-zA-Z_]* {
       def compile
@@ -125,11 +155,13 @@ grammar SQL do
   rule CREATE do 'create' / 'CREATE' end
   rule DROP do 'drop' / 'DROP' end
   rule FLOAT do 'float' / 'FLOAT' end
+  rule FROM  do 'from' / 'FROM' end
   rule INDEX do 'index' / 'INDEX' end
   rule INT do 'int' / 'INT' end
   rule KEY do 'key' / 'KEY' end
   rule ON do 'on' / 'ON' end
   rule PRIMARY do 'primary' / 'PRIMARY' end
+  rule SELECT do 'select' / 'SELECT' end
   rule TABLE do 'table' / 'TABLE' end
   rule UNIQUE do 'unique' / 'UNIQUE' end
 

@@ -38,6 +38,24 @@ describe MiniSQL::SQLParser do
       [ :drop_index, :index_name ]
   end
 
+  it 'can parse SELECT * FROM' do
+    compile('SELECT * FROM the_table;').should ==
+      [ :select,
+        { :table => :the_table,
+          :columns => :*
+        }
+      ]
+  end
+
+  it 'can parse SELECT .. FROM' do
+    compile('SELECT col1,col2, col3 FROM the_table;').should ==
+      [ :select,
+        { :table => :the_table,
+          :columns => [:col1, :col2, :col3]
+        }
+      ]
+  end
+
   def compile str
     parsed = @parser.parse(str)
     parsed.should_not == nil
