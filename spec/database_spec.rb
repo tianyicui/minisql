@@ -1,6 +1,6 @@
 require 'minisql'
 
-describe MiniSQL do
+describe MiniSQL::Database do
 
   before :each do
     @db = MiniSQL::Database.new db_file
