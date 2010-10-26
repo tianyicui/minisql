@@ -3,7 +3,11 @@ module MiniSQL
 grammar SQL do
 
   rule expression do
-      create_table_exp / drop_table_exp / create_index_exp / drop_index_exp / select_exp
+      create_table_exp / 
+      drop_table_exp / 
+      create_index_exp / 
+      drop_index_exp / 
+      select_exp
   end
 
 ######
@@ -130,9 +134,11 @@ grammar SQL do
   end
 
   rule where_clause do
-    WHERE _ head:where_condition tail:( _ AND _ where:where_condition )* {
+    WHERE _ head:where_condition
+    tail:( _ AND _ cond:where_condition )* {
       def compile
-        Set.new [ head.compile, *tail.elements.map{|e| e.where.compile} ]
+        require 'set'
+        Set.new [ head.compile, *tail.elements.map{|e| e.cond.compile} ]
       end
     }
   end
