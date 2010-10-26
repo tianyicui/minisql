@@ -56,6 +56,21 @@ describe MiniSQL::SQLParser do
       ]
   end
 
+  it 'can parse SELECT .. FROM .. WHRER' do
+    compile("SELECT * FROM the_table WHERE col0=1 AND col1<>'hello' AND col2<0.3 AND col3>=6;").should ==
+      [ :select,
+        { :table => :the_table,
+          :columns => '*',
+          :where => Set.new([
+            [ :'==', :col0, 1 ],
+            [ :'!=', :col1, 'hello' ],
+            [ :'<', :col2, 0.3 ],
+            [ :'>=', :col3, 6 ]
+          ])
+        }
+      ]
+  end
+
   def compile str
     parsed = @parser.parse(str)
     parsed.should_not == nil

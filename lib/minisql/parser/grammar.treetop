@@ -105,13 +105,18 @@ grammar SQL do
 ######
 
   rule select_exp do
-    _? SELECT _ columns:(star / name_seq) _ FROM _ name _? ';' _? {
+    _? SELECT _ columns:(star / name_seq) _ FROM _ name
+    where:(_ where_clause)?
+    _? ';' _? {
       def compile
         [ :select,
           { :table => name.compile,
-            :columns => columns.compile
-          }
+            :columns => columns.compile,
+          }.merge!(where_hash)
         ]
+      end
+      def where_hash
+        where.text_value.empty? ? {} : {:where => where.where_clause.compile}
       end
     }
   end
@@ -124,7 +129,55 @@ grammar SQL do
     }
   end
 
+  rule where_clause do
+    WHERE _ head:where_condition tail:(AND _ where:where_condition)* {
+      def compile
+        Set.new [ head.compile, *tail.elements.map{|e| e.where.compile} ]
+      end
+    }
+  end
+
+  rule where_condition do
+    name _? where_op _? value {
+      def compile
+        [ where_op.compile, name.compile, value.compile ]
+      end
+    }
+  end
+
+  rule where_op do
+    '=' / '<>' / '<' / '>' / '<=' / '>=' {
+      def compile
+        case text_value
+        when '=' then :'=='
+        when '<>' then :'!='
+        else text_value.to_sym
+        end
+      end
+    }
+  end
+
 ######
+
+  rule value do
+    number / float_number / string_literal
+  end
+
+  rule float_number do
+    number '.' number {
+      def compile
+        text.to_f
+      end
+    }
+  end
+
+  rule string_literal do
+    "'" string:(!"'" . )* "'" {
+      def compile
+        string.text_value
+      end
+    }
+  end
 
   rule name_seq do
     head:name _? tail:(',' _? name)* {
@@ -151,6 +204,7 @@ grammar SQL do
   end
 
 
+  rule AND do 'and' / 'AND' end
   rule CHAR do 'char' / 'CHAR' end
   rule CREATE do 'create' / 'CREATE' end
   rule DROP do 'drop' / 'DROP' end
@@ -164,6 +218,7 @@ grammar SQL do
   rule SELECT do 'select' / 'SELECT' end
   rule TABLE do 'table' / 'TABLE' end
   rule UNIQUE do 'unique' / 'UNIQUE' end
+  rule WHERE do 'where' / 'WHERE' end
 
 end
 
