@@ -146,7 +146,7 @@ grammar SQL do
   end
 
   rule where_op do
-    ('=' / '<>' / '<' / '>' / '<=' / '>=') {
+    ( '=' / ( '<' ('='/'>')? ) / ('>' '='?) ) {
       def compile
         case text_value
         when '=' then :'=='
