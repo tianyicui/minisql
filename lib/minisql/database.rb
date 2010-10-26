@@ -4,10 +4,12 @@ module MiniSQL
 
     require 'sqlite3'
     require 'minisql/catalog'
+    require 'minisql/parser'
 
     def initialize filename
       @catalog = Catalog.new filename
       @sqlite = SQLite3::Database.new filename+'/.sqlite'
+      @parser = MiniSQL::SQLParser.new
     end
 
     # create_table :table do
@@ -72,6 +74,7 @@ module MiniSQL
 
     def execute command, &block
       puts command if @verbose
+      @parser.parse command # to be handled to catalog
       @sqlite.execute command, &block
     end
 
