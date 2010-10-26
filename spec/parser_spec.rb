@@ -16,7 +16,7 @@ describe MiniSQL::SQLParser do
           :columns => [
             { :name => :int_col, :type => 'int' },
             { :name => :float_col, :type => 'float', :unique => true },
-            { :name => :char_col, :type => ['char', 16] }
+            { :name => :char_col, :type => 'char', :length => 16 }
           ],
           :primary_key => :int_col
         }

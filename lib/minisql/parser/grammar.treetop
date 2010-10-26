@@ -3,14 +3,7 @@ module MiniSQL
 grammar SQL do
 
   rule expression do
-    subexp:(
-      create_table_exp/
-      drop_table_exp
-    ) _? {
-      def compile
-        subexp.compile
-      end
-    }
+      create_table_exp / drop_table_exp
   end
 
 ######
@@ -31,20 +24,19 @@ grammar SQL do
   end
 
   rule column_seq do
-    columns:(column_exp+) _? {
+    column_exp+ {
       def compile
-        columns.elements.map { |e| e.compile }
+        elements.map { |e| e.compile }
       end
     }
   end
 
   rule column_exp do
-    _? name _ type:(int_or_float / char_type) unique:( _ UNIQUE)? _? ',' _? {
+    _? name _ type:(int_or_float / char_type) unique:(_ UNIQUE)? _? ',' _? {
       def compile
-        rst={}
-        rst[:name]=name.compile
-        rst[:type]=type.compile
-        rst[:unique]=true unless unique.text_value.empty?
+        rst = { :name => name.compile }
+        rst.merge! type.compile
+        rst[:unique] = true unless unique.text_value.empty?
         rst
       end
     }
@@ -73,7 +65,7 @@ grammar SQL do
   rule int_or_float do
     (INT / FLOAT) {
       def compile
-        self.text_value.downcase
+        { :type => text_value.downcase }
       end
     }
   end
@@ -81,7 +73,7 @@ grammar SQL do
   rule char_type do
     _? CHAR _? '(' _? number _? ')' _? {
       def compile
-        ['char', number.text_value.to_i]
+        { :type => 'char', :length => number.text_value.to_i }
       end
     }
   end
@@ -89,7 +81,7 @@ grammar SQL do
   rule name do
     [a-zA-Z_] [0-9a-zA-Z_]* {
       def compile
-        self.text_value.to_sym
+        text_value.to_sym
       end
     }
   end
