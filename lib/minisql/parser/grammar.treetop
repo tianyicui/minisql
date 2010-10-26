@@ -3,7 +3,7 @@ module MiniSQL
 grammar SQL do
 
   rule expression do
-      create_table_exp / drop_table_exp
+      create_table_exp / drop_table_exp / create_index_exp
   end
 
 ######
@@ -50,6 +50,22 @@ grammar SQL do
     }
   end
 
+  rule int_or_float do
+    (INT / FLOAT) {
+      def compile
+        { :type => text_value.downcase.to_sym }
+      end
+    }
+  end
+
+  rule char_type do
+    _? CHAR _? '(' _? number _? ')' _? {
+      def compile
+        { :type => :char, :length => number.text_value.to_i }
+      end
+    }
+  end
+
 ######
 
   rule drop_table_exp do
@@ -62,21 +78,21 @@ grammar SQL do
 
 ######
 
-  rule int_or_float do
-    (INT / FLOAT) {
+  rule create_index_exp do
+    _? CREATE _ INDEX _ index:name _ ON _ table:name _?
+    '(' _? column:name _? ')' _? ';' _? {
       def compile
-        { :type => text_value.downcase }
+        [ :create_index,
+          { :name => index.compile,
+            :table => table.compile,
+            :column => column.compile
+          }
+        ]
       end
     }
   end
 
-  rule char_type do
-    _? CHAR _? '(' _? number _? ')' _? {
-      def compile
-        { :type => 'char', :length => number.text_value.to_i }
-      end
-    }
-  end
+######
 
   rule name do
     [a-zA-Z_] [0-9a-zA-Z_]* {
@@ -99,8 +115,10 @@ grammar SQL do
   rule CREATE do 'create' / 'CREATE' end
   rule DROP do 'drop' / 'DROP' end
   rule FLOAT do 'float' / 'FLOAT' end
+  rule INDEX do 'index' / 'INDEX' end
   rule INT do 'int' / 'INT' end
   rule KEY do 'key' / 'KEY' end
+  rule ON do 'on' / 'ON' end
   rule PRIMARY do 'primary' / 'PRIMARY' end
   rule TABLE do 'table' / 'TABLE' end
   rule UNIQUE do 'unique' / 'UNIQUE' end
