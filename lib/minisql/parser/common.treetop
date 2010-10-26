@@ -5,13 +5,14 @@ grammar Common do
   include Keywords
 
   rule value do
-    number / float_number / string_literal
+    # here float_number must comes earlier than number
+    float_number / number / string_literal
   end
 
   rule float_number do
-    number '.' number {
+    number '.' [0-9]* {
       def compile
-        text.to_f
+        text_value.to_f
       end
     }
   end
@@ -41,7 +42,7 @@ grammar Common do
   end
 
   rule number do
-    [1-9] [0-9]* {
+    '-'? ( '0' / ([1-9] [0-9]*) ) {
       def compile
         text_value.to_i
       end

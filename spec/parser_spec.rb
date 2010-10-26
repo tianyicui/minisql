@@ -74,7 +74,7 @@ describe MiniSQL::SQLParser do
     compile("SELECT * FROM the_table WHERE col0=1 AND col1<>'hello' AND col2<0.3 AND col3>=6;").should ==
       [ :select,
         { :table => :the_table,
-          :columns => '*',
+          :columns => :*,
           :where => Set.new([
             [ :'==', :col0, 1 ],
             [ :'!=', :col1, 'hello' ],
