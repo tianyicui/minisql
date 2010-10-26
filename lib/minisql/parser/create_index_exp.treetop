@@ -1,0 +1,25 @@
+module MiniSQL
+
+grammar CreateIndexExp do
+
+  include Common
+
+  rule create_index_exp do
+    _? CREATE _ INDEX _ index:name _ ON _ table:name _?
+    '(' _? column:name _? ')' _? ';' _? {
+      def compile
+        [ :create_index,
+          { :name => index.compile,
+            :table => table.compile,
+            :column => column.compile
+          }
+        ]
+      end
+    }
+  end
+
+end
+
+end
+
+# vim: filetype=ruby

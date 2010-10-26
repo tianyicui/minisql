@@ -1,0 +1,19 @@
+module MiniSQL
+
+grammar DropTableExp do
+
+  include Common
+
+  rule drop_table_exp do
+    _? DROP _ TABLE _ name _? ';' _? {
+      def compile
+        [ :drop_table, name.compile ]
+      end
+    }
+  end
+
+end
+
+end
+
+# vim: filetype=ruby

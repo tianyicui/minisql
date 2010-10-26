@@ -1,0 +1,69 @@
+module MiniSQL
+
+grammar CreateTableExp
+
+  include Common
+
+  rule create_table_exp do
+    _? CREATE _ TABLE _ name _? '(' _?
+      column_seq
+      primary_key_exp
+    ')' _? ';' _? {
+        def compile
+          rst={}
+          rst[:name]=name.compile
+          rst[:columns]=column_seq.compile
+          rst[:primary_key]=primary_key_exp.compile
+          [ :create_table, rst ]
+        end
+    }
+  end
+
+  rule column_seq do
+    column_exp+ {
+      def compile
+        elements.map { |e| e.compile }
+      end
+    }
+  end
+
+  rule column_exp do
+    _? name _ type:(int_or_float / char_type) unique:(_ UNIQUE)? _? ',' _? {
+      def compile
+        rst = { :name => name.compile }
+        rst.merge! type.compile
+        rst[:unique] = true unless unique.text_value.empty?
+        rst
+      end
+    }
+  end
+
+  rule primary_key_exp do
+    _? PRIMARY _ KEY _? '(' _? name _? ')' _? {
+      def compile
+        name.compile
+      end
+    }
+  end
+
+  rule int_or_float do
+    (INT / FLOAT) {
+      def compile
+        { :type => text_value.downcase.to_sym }
+      end
+    }
+  end
+
+  rule char_type do
+    _? CHAR _? '(' _? number _? ')' _? {
+      def compile
+        { :type => :char, :length => number.compile }
+      end
+    }
+  end
+
+end
+
+end
+
+# vim: filetype=ruby

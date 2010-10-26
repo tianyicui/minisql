@@ -1,0 +1,25 @@
+module MiniSQL
+
+grammar Keywords do
+
+  rule AND do 'and' / 'AND' end
+  rule CHAR do 'char' / 'CHAR' end
+  rule CREATE do 'create' / 'CREATE' end
+  rule DROP do 'drop' / 'DROP' end
+  rule FLOAT do 'float' / 'FLOAT' end
+  rule FROM  do 'from' / 'FROM' end
+  rule INDEX do 'index' / 'INDEX' end
+  rule INT do 'int' / 'INT' end
+  rule KEY do 'key' / 'KEY' end
+  rule ON do 'on' / 'ON' end
+  rule PRIMARY do 'primary' / 'PRIMARY' end
+  rule SELECT do 'select' / 'SELECT' end
+  rule TABLE do 'table' / 'TABLE' end
+  rule UNIQUE do 'unique' / 'UNIQUE' end
+  rule WHERE do 'where' / 'WHERE' end
+
+end
+
+end
+
+# vim: filetype=ruby

@@ -1,0 +1,19 @@
+module MiniSQL
+
+grammar DropIndexExp do
+
+  include Common
+
+  rule drop_index_exp do
+    _? DROP _ INDEX _ index:name _? ';' _? {
+      def compile
+        [ :drop_index, index.compile ]
+      end
+    }
+  end
+
+end
+
+end
+
+# vim: filetype=ruby

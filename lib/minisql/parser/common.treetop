@@ -1,0 +1,59 @@
+module MiniSQL
+
+grammar Common do
+
+  include Keywords
+
+  rule value do
+    number / float_number / string_literal
+  end
+
+  rule float_number do
+    number '.' number {
+      def compile
+        text.to_f
+      end
+    }
+  end
+
+  rule string_literal do
+    "'" string:(!"'" . )* "'" {
+      def compile
+        string.text_value
+      end
+    }
+  end
+
+  rule name_seq do
+    head:name _? tail:(',' _? name)* {
+      def compile
+        [ head.compile, *tail.elements.map{|e| e.name.compile} ]
+      end
+    }
+  end
+
+  rule name do
+    [a-zA-Z_] [0-9a-zA-Z_]* {
+      def compile
+        text_value.to_sym
+      end
+    }
+  end
+
+  rule number do
+    [1-9] [0-9]* {
+      def compile
+        text_value.to_i
+      end
+    }
+  end
+
+  rule _ do
+    [ \n\r\t]+
+  end
+
+end
+
+end
+
+# vim: filetype=ruby
