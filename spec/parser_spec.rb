@@ -33,7 +33,14 @@ describe MiniSQL::SQLParser do
       ]
   end
 
+  it 'can parse DROP INDEX' do
+    compile('DROP INDEX index_name;').should ==
+      [ :drop_index, :index_name ]
+  end
+
   def compile str
-    @parser.parse(str).compile
+    parsed = @parser.parse(str)
+    parsed.should_not == nil
+    parsed.compile
   end
 end
