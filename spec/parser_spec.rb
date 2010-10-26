@@ -85,6 +85,15 @@ describe MiniSQL::SQLParser do
       ]
   end
 
+  it 'can parse INSERT INTO' do
+    compile("INSERT INTO the_table VALUES ( 0, 1.0, 'lisp', -1, -7.5 );").should ==
+      [ :insert_into,
+        { :table => :the_table,
+          :values => [ 0, 1.0, 'lisp', -1, -7.5 ]
+        }
+      ]
+  end
+
   def compile str, verbose=false
     parsed = @parser.parse(str)
     parsed.should_not == nil

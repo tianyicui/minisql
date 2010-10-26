@@ -9,13 +9,16 @@ grammar Keywords do
   rule FLOAT do 'float' / 'FLOAT' end
   rule FROM  do 'from' / 'FROM' end
   rule INDEX do 'index' / 'INDEX' end
+  rule INSERT do 'insert' / 'INSERT' end
   rule INT do 'int' / 'INT' end
+  rule INTO do 'into' / 'INTO' end
   rule KEY do 'key' / 'KEY' end
   rule ON do 'on' / 'ON' end
   rule PRIMARY do 'primary' / 'PRIMARY' end
   rule SELECT do 'select' / 'SELECT' end
   rule TABLE do 'table' / 'TABLE' end
   rule UNIQUE do 'unique' / 'UNIQUE' end
+  rule VALUES do 'values' / 'VALUES' end
   rule WHERE do 'where' / 'WHERE' end
 
 end

@@ -7,13 +7,15 @@ grammar SQL do
   include CreateIndexExp
   include DropIndexExp
   include SelectExp
+  include InsertIntoExp
 
   rule expression do
       create_table_exp / 
       drop_table_exp / 
       create_index_exp / 
       drop_index_exp / 
-      select_exp
+      select_exp / 
+      insert_into_exp
   end
 
 end
