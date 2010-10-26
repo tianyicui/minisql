@@ -5,6 +5,10 @@ describe MiniSQL::SQLParser do
     @parser = MiniSQL::SQLParser.new
   end
 
+  before :each do
+    @parser.root='expression'
+  end
+
   it 'can parse CREATE TABLE' do
     compile('CREATE TABLE tbl ( int_col INT, float_col FLOAT UNIQUE, char_col CHAR(16), PRIMARY KEY (int_col) );').
       should == [ :create_table,
@@ -56,6 +60,16 @@ describe MiniSQL::SQLParser do
       ]
   end
 
+  it 'can parse WHERE clause' do
+    @parser.root='where_clause'
+    compile('WHERE col0=1').should == Set.new([ [ :'==', :col0, 1] ])
+  end
+
+  it 'can parse WHERE clause with AND' do
+    @parser.root='where_clause'
+    compile("WHERE col0=1 AND col1<>'hello' AND col2<0.3 AND col3>=6")
+  end
+
   it 'can parse SELECT .. FROM .. WHRER' do
     compile("SELECT * FROM the_table WHERE col0=1 AND col1<>'hello' AND col2<0.3 AND col3>=6;").should ==
       [ :select,
@@ -71,9 +85,14 @@ describe MiniSQL::SQLParser do
       ]
   end
 
-  def compile str
+  def compile str, verbose=false
     parsed = @parser.parse(str)
     parsed.should_not == nil
+    if verbose
+      puts '==='
+      print parsed.inspect
+      puts '==='
+    end
     parsed.compile
   end
 end

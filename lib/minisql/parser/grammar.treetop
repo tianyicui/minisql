@@ -61,7 +61,7 @@ grammar SQL do
   rule char_type do
     _? CHAR _? '(' _? number _? ')' _? {
       def compile
-        { :type => :char, :length => number.text_value.to_i }
+        { :type => :char, :length => number.compile }
       end
     }
   end
@@ -146,7 +146,7 @@ grammar SQL do
   end
 
   rule where_op do
-    '=' / '<>' / '<' / '>' / '<=' / '>=' {
+    ('=' / '<>' / '<' / '>' / '<=' / '>=') {
       def compile
         case text_value
         when '=' then :'=='
@@ -196,7 +196,11 @@ grammar SQL do
   end
 
   rule number do
-    [1-9] [0-9]*
+    [1-9] [0-9]* {
+      def compile
+        text_value.to_i
+      end
+    }
   end
 
   rule _ do
