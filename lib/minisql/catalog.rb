@@ -35,7 +35,7 @@ module MiniSQL
 
       def read name
         file = entity_file(name)
-        Psych.loadfile file
+        YAML.load_file file
       end
 
       def delete name
@@ -46,7 +46,7 @@ module MiniSQL
       protected
 
       def entity_file name, should_exist=true
-        file = @path+name
+        file = @path+name.to_s
         if should_exist
           raise "#{@kind} named #{name} doesn't exist" unless file.exist?
         else

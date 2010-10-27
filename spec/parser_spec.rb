@@ -14,7 +14,7 @@ describe MiniSQL::SQLParser do
   end
 
   it 'can parse CREATE TABLE' do
-    compile(sample_table_ddl).should == sample_table_info
+    compile(sample_table_ddl).should == [:create_table, sample_table_info]
   end
 
   it 'can parse DROP TABLE' do
