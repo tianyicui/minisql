@@ -58,7 +58,7 @@ module MiniSQL
     end
 
     def insert_into table, values
-      execute "INSERT INTO #{table} VALUES ( #{values.map{|v| v.inspect}.join(', ')} );"
+      execute "INSERT INTO #{table} VALUES ( #{values.map(&:inspect).join(', ')} );"
     end
 
     # delete_from(:tbl)

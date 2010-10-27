@@ -22,7 +22,7 @@ grammar CreateTableExp
   rule column_seq do
     column_exp+ {
       def compile
-        elements.map { |e| e.compile }
+        elements.map(&:compile)
       end
     }
   end

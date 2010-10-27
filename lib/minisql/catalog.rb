@@ -21,7 +21,7 @@ module MiniSQL
       end
 
       def entities
-        (Dir.entries(@path) - ['.', '..']).map{|f| f.to_sym}
+        (Dir.entries(@path) - ['.', '..']).map(&:to_sym)
       end
 
       def create info

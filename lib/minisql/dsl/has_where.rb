@@ -27,7 +27,7 @@ module MiniSQL::DSL
 
       def dump
         raise 'empty where clause' if @columns.empty?
-        'WHERE ' + @columns.map{|c| c.dump }.join(' and ')
+        'WHERE ' + @columns.map(&:dump).join(' and ')
       end
 
       class Column
