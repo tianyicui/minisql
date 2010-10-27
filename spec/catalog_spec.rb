@@ -1,3 +1,4 @@
+require 'rspec'
 require 'minisql'
 require 'spec_helper_methods'
 
