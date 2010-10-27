@@ -1,6 +1,10 @@
 require 'minisql/parser'
+require 'spec_helper_methods'
 
 describe MiniSQL::SQLParser do
+
+  include SpecHelperMethods
+
   before :all do
     @parser = MiniSQL::SQLParser.new
   end
@@ -10,17 +14,7 @@ describe MiniSQL::SQLParser do
   end
 
   it 'can parse CREATE TABLE' do
-    compile('CREATE TABLE tbl ( int_col INT, float_col FLOAT UNIQUE, char_col CHAR(16), PRIMARY KEY (int_col) );').
-      should == [ :create_table,
-        { :name => :tbl,
-          :columns => [
-            { :name => :int_col, :type => :int },
-            { :name => :float_col, :type => :float, :unique => true },
-            { :name => :char_col, :type => :char, :length => 16 }
-          ],
-          :primary_key => :int_col
-        }
-      ]
+    compile(sample_table_ddl).should == sample_table_info
   end
 
   it 'can parse DROP TABLE' do

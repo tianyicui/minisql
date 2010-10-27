@@ -12,6 +12,8 @@ module MiniSQL
       @parser = MiniSQL::SQLParser.new
     end
 
+    attr_reader :catalog
+
     # create_table :table do
     #   column[:co1].char(16).unique
     #   column[:co2].int

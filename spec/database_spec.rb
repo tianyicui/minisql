@@ -1,15 +1,16 @@
 require 'minisql'
+require 'spec_helper_methods'
 
 describe MiniSQL::Database do
 
+  include SpecHelperMethods
+
   before :each do
-    @db = MiniSQL::Database.new db_file
+    init_db
   end
 
   after :each do
-    @db.close
-    require 'fileutils'
-    FileUtils.rm_rf db_file
+    clean_db
   end
 
   it 'can be initialized and closed' do
@@ -97,46 +98,6 @@ describe MiniSQL::Database do
       column[:int_col] < 1
     end
     @db.select['*'].from(:tbl).to_a.should == [sample_data]
-  end
-
-  def create_sample_table
-    ddl = @db.create_table :tbl do
-      column[:int_col].int
-      column[:float_col].float
-      column[:char_col].char(16).unique
-      primary_key :int_col
-    end
-
-    ddl.split.should == <<-EOF.split
-    CREATE TABLE tbl (
-      int_col INT,
-      float_col FLOAT,
-      char_col CHAR(16) UNIQUE,
-      PRIMARY KEY ( int_col )
-    );
-    EOF
-    @db.tables.should include :tbl
-  end
-
-  def insert_sample_data data=nil
-    create_sample_table unless @db.tables.include? :tbl
-    data = sample_data if data.nil?
-    @db.eval do
-      insert_into :tbl, data
-      select['*'].from(:tbl).where do
-        column[:int_col] == data[0]
-        column[:float_col] == data[1]
-        column[:char_col] == data[2]
-      end.to_a.should == [data]
-    end
-  end
-
-  def sample_data
-    [42, 2.17, 'resolution']
-  end
-
-  def db_file
-    '/tmp/database.db'
   end
 
 end
