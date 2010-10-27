@@ -75,34 +75,17 @@ module MiniSQL
     end
 
     def execute command, &block
-      puts command if @verbose
       ir = @parser.parse(command).compile
       @catalog.execute ir unless ir.nil?
       @sqlite.execute command, &block
     end
 
     def tables
-      result = []
-      select[:name].from(meta_table).where do
-        column[:type] == 'table'
-      end.each do |row|
-        result << row[0].to_sym
-      end
-      result
-    end
-
-    def meta_table
-      :sqlite_master
+      @catalog.tables
     end
 
     def close
       @sqlite.close
-    end
-
-    attr_accessor :verbose
-
-    def verbose!
-      @verbose=true
     end
 
     def eval &block

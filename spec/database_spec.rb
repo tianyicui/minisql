@@ -47,13 +47,13 @@ describe MiniSQL::Database do
   it 'can select * from table' do
     create_sample_table
     @db.select['*'].from(:tbl).to_a.should == []
-    @db.select['*'].from(@db.meta_table).to_a[0].should include('tbl')
+    @db.select['*'].from(sqlite_meta_table).to_a[0].should include('tbl')
   end
 
   it 'can select columns from table' do
     create_sample_table
     @db.select[:int_col, :float_col].from(:tbl).to_a.should == []
-    @db.select[:type, :name].from(@db.meta_table).to_a.should include(['table', 'tbl'])
+    @db.select[:type, :name].from(sqlite_meta_table).to_a.should include(['table', 'tbl'])
   end
 
   it 'can select from table where ...' do
@@ -65,7 +65,13 @@ describe MiniSQL::Database do
       column[:char_col] != 'abc'
     end.to_a.should == []
 
-    @db.select[:type, :name].from(@db.meta_table).where do
+    @db.select['*'].from(:tbl).where do
+      column[:int_col] >= 0
+      column[:float_col] <= 1
+      column[:char_col] != 'abc'
+    end.to_a.should == []
+
+    @db.select[:type, :name].from(sqlite_meta_table).where do
       column[:type] == 'table'
       column[:name] == 'tbl'
     end.to_a.should == [['table', 'tbl']]

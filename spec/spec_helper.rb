@@ -70,4 +70,8 @@ module SpecHelperMethods
     '/tmp/database.db'
   end
 
+  def sqlite_meta_table
+    'sqlite_master'
+  end
+
 end
