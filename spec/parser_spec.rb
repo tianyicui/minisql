@@ -1,5 +1,5 @@
+require 'spec_helper'
 require 'minisql/parser'
-require 'spec_helper_methods'
 
 describe MiniSQL::SQLParser do
 

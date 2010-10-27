@@ -1,3 +1,8 @@
+require 'simplecov'
+SimpleCov.start
+
+require 'rspec'
+
 module SpecHelperMethods
 
   def init_db
