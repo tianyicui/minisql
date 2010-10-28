@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'minisql'
+require 'minisql/database'
 
 describe MiniSQL::Database do
 
