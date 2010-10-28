@@ -6,12 +6,11 @@ require 'rspec'
 module SpecHelperMethods
 
   def init_db
-    @db = MiniSQL::Database.new tmp_file
+    @db = MiniSQL::Database.new new_tmp_file
   end
 
   def clean_db
     @db.close
-    clean_tmp_file
   end
 
   def create_sample_table
@@ -65,13 +64,17 @@ module SpecHelperMethods
     [42, 2.17, 'resolution']
   end
 
-  def tmp_file
-    @tmp_file = '/tmp/database.db'
+  def new_tmp_file
+    @tmp_file = tmp_file
+    if File.exist? @tmp_file
+      require 'fileutils'
+      FileUtils.rm_rf @tmp_file
+    end
+    return @tmp_file
   end
 
-  def clean_tmp_file
-    require 'fileutils'
-    FileUtils.rm_rf @tmp_file
+  def tmp_file
+    '/tmp/database.db'
   end
 
   def sqlite_meta_table
