@@ -17,16 +17,26 @@ describe MiniSQL::Buffer do
     File.exists?(@tmp_file).should == true
   end
 
+  it 'will return nil if no such buffer' do
+    @buffer.get_block(0).should == nil
+    test_one_block 0
+    @buffer.get_block(0).should_not == nil
+    test_one_block 3
+    @buffer.get_block(2).should_not == nil
+    @buffer.get_block(4).should == nil
+  end
+
   it 'can set and get one block' do
     test_one_block 7
   end
 
-  it 'can set and get block sequentially' do
-    (0..10).each {|i| test_one_block i}
+  it 'can set and get two block' do
+    test_blocks [1,0]
   end
 
-  it 'can set and get block increasingly' do
-    (0..10).each { |i| test_one_block i*2 }
+  it 'can set and get block sequentially' do
+    test_blocks 0..10
+    test_blocks (0..10).map{|i| i*2}
   end
 
   it 'can set and get blocks - test 1' do
@@ -45,7 +55,7 @@ describe MiniSQL::Buffer do
   def test_blocks enum
     enum.each { |i| test_one_block i }
     renew_buffer
-    enum.reverse.each { |i| test_one_block i }
+    enum.to_a.reverse.each { |i| test_one_block i }
   end
 
   def test_one_block num
@@ -54,11 +64,8 @@ describe MiniSQL::Buffer do
     @buffer.set_block num, set
     renew_buffer @tmp_file
     got = @buffer.get_block(num)
-    if set != got
-      puts num
-      raise
-    end
-    set.should == got
+    got.should == set
+    @buffer.file.size.should >= num * @buffer.block_size
   end
 
   def random_string size
@@ -71,7 +78,11 @@ describe MiniSQL::Buffer do
   end
 
   def new_buffer file=nil
-    MiniSQL::Buffer.new(file || new_tmp_file)
+    MiniSQL::Buffer.new(file || new_tmp_file, block_size)
+  end
+
+  def block_size
+    64
   end
 
   def renew_buffer file=nil
