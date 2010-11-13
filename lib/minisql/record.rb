@@ -1,3 +1,5 @@
+require 'minisql/buffer'
+
 module MiniSQL
 
   class Record

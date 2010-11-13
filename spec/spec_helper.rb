@@ -81,4 +81,8 @@ module SpecHelperMethods
     'sqlite_master'
   end
 
+  def new_buffer file=nil
+    MiniSQL::Buffer.new(file || new_tmp_file, block_size)
+  end
+
 end

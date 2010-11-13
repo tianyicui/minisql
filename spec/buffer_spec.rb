@@ -77,11 +77,7 @@ describe MiniSQL::Buffer do
     result
   end
 
-  def new_buffer file=nil
-    MiniSQL::Buffer.new(file || new_tmp_file, block_size)
-  end
-
-  def block_size
+ def block_size
     64
   end
 
