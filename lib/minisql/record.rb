@@ -6,13 +6,14 @@ module MiniSQL
 
     def initialize table_info, buffer, update_table_callback
       @table = table_info
+      @columns = columns
       @table[:size] = 0 unless @table[:size]
       @pack_string = pack_string
       @record_size = record_size
 
       @buffer = buffer
       @block_size = buffer.block_size
-      @records_in_block = block_size / record_size
+      @records_per_block = @block_size / @record_size
 
       @update_table = update_table_callback
     end
@@ -28,7 +29,7 @@ module MiniSQL
 
     def record_size
       result = 0
-      columns.each do |col|
+      @columns.each do |col|
         result +=
           case col[:type]
           when :int then 4
@@ -40,7 +41,7 @@ module MiniSQL
     end
 
     def columns
-      @table[:column]
+      @table[:columns]
     end
 
     def insert_record item
@@ -51,7 +52,7 @@ module MiniSQL
 
     def read_record num
       raise "No such record: ##{num}" unless 0 <= num && num < size
-      block = buffer.get_block(num / @records_in_block)
+      block = buffer.get_block(num / @records_per_block)
       data = block[num % @records_in_block, @record_size]
       deserialize data
     end
@@ -66,11 +67,11 @@ module MiniSQL
 
     def pack_string
       rst = ''
-      columns.each do |col|
+      @columns.each do |col|
         rst <<
         case col[:type]
         when :int then 'N'
-        when :float then 'G'
+        when :float then 'g'
         when :char then "a#{col[:length]}"
         end
       end

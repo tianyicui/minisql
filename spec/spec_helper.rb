@@ -61,7 +61,7 @@ module SpecHelperMethods
   end
 
   def sample_data
-    [42, 2.17, 'resolution']
+    [42, 2.17, 'resolution, wow!']
   end
 
   def new_tmp_file
