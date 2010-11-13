@@ -8,8 +8,8 @@ module MiniSQL
       @table = table_info
       @columns = columns
       @table[:size] = 0 unless @table[:size]
-      @pack_string = pack_string
-      @record_size = record_size
+      @pack_string = get_pack_string
+      @record_size = get_record_size
 
       @buffer = buffer
       @block_size = buffer.block_size
@@ -17,6 +17,8 @@ module MiniSQL
 
       @update_table = update_table_callback
     end
+
+    attr_reader :record_size, :pack_string, :records_per_block, :block_size, :buffer
 
     def size
       @table[:size]
@@ -27,7 +29,7 @@ module MiniSQL
       @update_table.call(@table)
     end
 
-    def record_size
+    def get_record_size
       result = 0
       @columns.each do |col|
         result +=
@@ -46,26 +48,35 @@ module MiniSQL
 
     def insert_record item
       data = serialize(item)
-      write_data data, @size
-      size += 1
+      self.size+=1
+      write_data data, size-1
     end
 
     def read_record num
       raise "No such record: ##{num}" unless 0 <= num && num < size
-      block = buffer.get_block(num / @records_per_block)
-      data = block[num % @records_in_block, @record_size]
+      block = buffer.get_block(num / records_per_block)
+      data = block[num % records_per_block, record_size]
       deserialize data
     end
 
+    def write_data data, num
+      raise "No such record: ##{num}" unless 0 <= num && num < size
+      block_number = num / records_per_block
+      block = buffer.get_block(block_number)
+      block = "\0"*block_size if not block
+      block[num % records_per_block, record_size] = data
+      @buffer.set_block(block_number, block)
+    end
+
     def serialize item
-      item.pack(@pack_string)
+      item.pack(pack_string)
     end
 
     def deserialize data
-      data.unpack(@pack_string)
+      data.unpack(pack_string)
     end
 
-    def pack_string
+    def get_pack_string
       rst = ''
       @columns.each do |col|
         rst <<

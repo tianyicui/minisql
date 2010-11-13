@@ -31,14 +31,31 @@ describe MiniSQL::Record do
     serialized.size.should == @record.record_size
 
     deserialized = @record.deserialize(serialized)
-    deserialized[1].should be_close(sample_data[1],0.01)
+    record_equal deserialized
+  end
 
-    deserialized[1] = sample_data[1]
-    deserialized.should == sample_data
+  it 'can insert and retrieve records' do
+    (0...100).each do |i|
+      data = sample_data
+      data[0] = i
+      @record.insert_record data
+    end
+    (0...100).each do |i|
+      data = sample_data
+      data[0] = i
+      record_equal @record.read_record(i), data
+    end
+  end
+
+  def record_equal data, origin=nil
+    origin = sample_data unless origin
+    data[1].should be_close(origin[1],0.0001)
+    data[1] = origin[1]
+    data.should == origin
   end
 
   def block_size
-    1024
+    123
   end
 
 end
