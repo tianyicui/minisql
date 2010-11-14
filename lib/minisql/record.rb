@@ -26,6 +26,10 @@ module MiniSQL
       select_records(selector).map(&mapper)
     end
 
+    def delete_from where
+      delete_records(where_functor(where))
+    end
+
     def column_selector to_select
       return lambda {|x| x} if to_select == :*
       lambda do |l|

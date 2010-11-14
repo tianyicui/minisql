@@ -33,6 +33,10 @@ module MiniSQL
         records[info[:table]].insert_record(info[:values])
       end
 
+      def delete_from info
+        records[info[:table]].delete_from(info[:where])
+      end
+
       def execute info
         command = info.first
         return send(command, info[1]) if respond_to? command
