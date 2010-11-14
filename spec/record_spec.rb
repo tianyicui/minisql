@@ -40,7 +40,7 @@ describe MiniSQL::Record do
       data[0] = i
       @record.insert_record data
     end
-    (0...100).each do |i|
+    (0...100).to_a.shuffle.each do |i|
       data = sample_data
       data[0] = i
       record_equal @record.read_record(i), data

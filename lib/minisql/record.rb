@@ -55,7 +55,7 @@ module MiniSQL
     def read_record num
       raise "No such record: ##{num}" unless 0 <= num && num < size
       block = buffer.get_block(num / records_per_block)
-      data = block[num % records_per_block, record_size]
+      data = block[num % records_per_block * record_size, record_size]
       deserialize data
     end
 
@@ -64,8 +64,8 @@ module MiniSQL
       block_number = num / records_per_block
       block = buffer.get_block(block_number)
       block = "\0"*block_size if not block
-      block[num % records_per_block, record_size] = data
-      @buffer.set_block(block_number, block)
+      block[num % records_per_block * record_size, record_size] = data
+      buffer.set_block(block_number, block)
     end
 
     def serialize item
