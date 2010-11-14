@@ -26,6 +26,7 @@ module MiniSQL
       end
 
       def select info
+        records[info[:table]].select(info)
       end
 
       def execute info
@@ -124,10 +125,11 @@ module MiniSQL
     end
 
     def execute command
+      sqlite_result = @sqlite.execute command
       hash = @parser.parse(command).compile
       @catalog.execute hash
-      @records.execute hash
-      @sqlite.execute command
+      my_result = @records.execute hash
+      my_result
     end
 
     def tables
