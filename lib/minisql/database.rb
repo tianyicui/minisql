@@ -6,10 +6,59 @@ module MiniSQL
     require 'minisql/catalog'
     require 'minisql/parser'
 
+    class Records
+      require 'minisql/record'
+
+      def initialize filename, catalog
+        @root = Pathname(filename) + 'records'
+        require 'fileutils'
+        FileUtils.mkdir_p @root
+        @catalog = catalog
+
+        @records = {}
+        catalog.tables.each do |table|
+          add_record(table)
+        end
+      end
+
+      def create_table info
+        add_record info[:name]
+      end
+
+      def select info
+      end
+
+      def execute info
+        command = info.first
+        return send(command, info[1]) if respond_to? command
+        []
+      end
+
+      protected
+
+      attr_reader :catalog, :records, :root
+
+      def add_record table
+        records[table] = get_record(table)
+      end
+
+      def get_record table
+        table_info = catalog.table_info(table)
+        buffer = Buffer.new root + table.to_s
+        records[table] = Record.new(table_info, buffer,
+          lambda do |new_table_info|
+            @catalog.drop_table table
+            @catalog.create_table new_table_info
+          end)
+      end
+
+    end
+
     def initialize filename
       @catalog = Catalog.new filename
+      @records = Records.new filename, @catalog
+      @parser = SQLParser.new
       @sqlite = SQLite3::Database.new filename+'/.sqlite'
-      @parser = MiniSQL::SQLParser.new
     end
 
     attr_reader :catalog
@@ -74,10 +123,11 @@ module MiniSQL
       DSL::Deletor.new self, table, &block
     end
 
-    def execute command, &block
-      ir = @parser.parse(command).compile
-      @catalog.execute ir unless ir.nil?
-      @sqlite.execute command, &block
+    def execute command
+      hash = @parser.parse(command).compile
+      @catalog.execute hash
+      @records.execute hash
+      @sqlite.execute command
     end
 
     def tables
