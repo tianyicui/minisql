@@ -26,9 +26,22 @@ module MiniSQL
       select_records(selector).map(&mapper)
     end
 
-    def column_selector columns
-      return lambda {|x| x}# if columns == :*
-      raise "Not implemented"
+    def column_selector to_select
+      return lambda {|x| x} if to_select == :*
+      lambda do |l|
+        rst = []
+        to_select.each do |name|
+          num = col_name_to_num(name)
+          rst << l[num]
+        end
+        rst
+      end
+    end
+
+    def col_name_to_num name
+      columns.each_with_index do |col, index|
+        return index if col[:name] == name
+      end
     end
 
     def where_functor where
