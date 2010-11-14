@@ -9,7 +9,7 @@ db = MiniSQL::Database.new "./minisql.db"
 
 while line = Readline.readline('> ', true)
   begin
-    puts db.execute(line)
+    puts db.execute(line).inspect
   rescue Exception => e
     puts e
   end
