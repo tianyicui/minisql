@@ -86,10 +86,10 @@ module MiniSQL
       all_blocks do |block, i|
         changed = false
         records_in_block(block, i) do |item, j|
-          if cond(item)
-            item = trans(item)
+          if cond[item]
+            item = trans[item]
             data = serialize item
-            block[j*records_size, record_size] = data
+            block[j*record_size, record_size] = data
             changed = true
           end
         end

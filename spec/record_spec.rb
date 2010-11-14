@@ -49,6 +49,14 @@ describe MiniSQL::Record do
     @record.size.should == 99
   end
 
+  it 'can delete records' do
+    insert_records
+    func = lambda {|i| i[0]%3==0}
+    @record.delete_records func
+    @record.select_records(func).size.should == 0
+    @records.size.should == 66
+  end
+
   it 'can select records' do
     insert_records
     meta_func = lambda {|i| lambda{|x| x[0]%3==i}}
@@ -61,6 +69,15 @@ describe MiniSQL::Record do
     insert_records
     @record.update_record(7,sample_data)
     record_equal @record.read_record(7), sample_data
+  end
+
+  it 'can update records' do
+    insert_records
+    func = lambda {|i| i[0]%3==0}
+    @record.update_records func, lambda{|i| i[0]=9875321; i}
+    @record.size.should == 100
+    @record.select_records(func).should == []
+    @record.select_records(lambda{|i| i[0]==9875321}).size.should == 34
   end
 
   def insert_records data_gen=lambda{|x| x}
