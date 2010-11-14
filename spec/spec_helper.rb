@@ -78,7 +78,7 @@ module SpecHelperMethods
   end
 
   def new_buffer file=nil
-    MiniSQL::Buffer.new(file || new_tmp_file, block_size)
+    MiniSQL::CachedBuffer.new(file || new_tmp_file, block_size)
   end
 
   def record_equal data, origin=nil

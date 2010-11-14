@@ -1,6 +1,5 @@
 module MiniSQL
 
-  # currently mocked
   class Buffer
 
     def initialize file, block_size = nil
@@ -45,6 +44,14 @@ module MiniSQL
       else
         file.seek num * block_size
       end
+    end
+
+  end
+
+  class CachedBuffer < Buffer
+
+    def initialize file, block_size = nil
+      super(file, block_size)
     end
 
   end

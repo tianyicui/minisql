@@ -53,7 +53,7 @@ module MiniSQL
 
       def get_record table
         table_info = catalog.table_info(table)
-        buffer = Buffer.new root + table.to_s
+        buffer = CachedBuffer.new root + table.to_s
         records[table] = Record.new(table_info, buffer,
           lambda do |new_table_info|
             @catalog.drop_table table
