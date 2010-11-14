@@ -56,7 +56,7 @@ module MiniSQL
           v1 = w[2]
           return false unless
             case w[0]
-            when :== then v0==v1
+            when :== then float_to_bin(v0) == float_to_bin(v1)
             when :< then v0<v1
             when :<= then v0<=v1
             when :>= then v0>=v1
@@ -66,6 +66,11 @@ module MiniSQL
         end
         true
       end
+    end
+
+    def float_to_bin f
+      return f unless f.class==Float
+      [f].pack('g')
     end
 
     def serialize item
