@@ -135,7 +135,11 @@ module MiniSQL
     end
 
     def execute command
-      hash = @parser.parse(command).compile
+      begin
+        hash = @parser.parse(command).compile
+      rescue
+        raise "Parse error"
+      end
       @catalog.execute hash
       @records.execute hash
     end
