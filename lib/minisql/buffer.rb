@@ -50,8 +50,32 @@ module MiniSQL
 
   class CachedBuffer < Buffer
 
+    CACHED_PAGES = 15
+
     def initialize file, block_size = nil
       super(file, block_size)
+      @cache = {}
+      @queue = []
+    end
+
+    def get_block num
+      return @cache[num] if @cache.has_key?(num)
+      add_cache(num, super(num))
+    end
+
+    def set_block num, content
+      @cache[num] = content if @cache.has_key?(num)
+      super(num,content)
+    end
+
+    protected
+
+    def add_cache num, content
+      @queue << num
+      if @queue.size >= CACHED_PAGES
+        @cache.delete(@queue.shift)
+      end
+      @cache[num] = content
     end
 
   end
