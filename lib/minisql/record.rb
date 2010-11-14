@@ -46,6 +46,7 @@ module MiniSQL
       columns.each_with_index do |col, index|
         return index if col[:name] == name
       end
+      raise "No such column #{name}"
     end
 
     def where_functor where

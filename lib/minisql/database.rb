@@ -137,6 +137,8 @@ module MiniSQL
       hash = @parser.parse(command).compile
       @catalog.execute hash
       my_result = @records.execute hash
+      require 'rspec'
+      sqlite_result.to_a.should == my_result
       my_result
     end
 
