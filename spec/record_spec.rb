@@ -35,15 +35,39 @@ describe MiniSQL::Record do
   end
 
   it 'can insert and retrieve records' do
-    (0...100).each do |i|
-      data = sample_data
-      data[0] = i
-      @record.insert_record data
-    end
+    insert_records
     (0...100).to_a.shuffle.each do |i|
       data = sample_data
       data[0] = i
       record_equal @record.read_record(i), data
+    end
+  end
+
+  it 'can delete records' do
+    insert_records
+    @record.delete_record 7
+    @record.size.should == 99
+  end
+
+  it 'can select records' do
+    insert_records
+    meta_func = lambda {|i| lambda{|x| x[0]%3==i}}
+    @record.select_records(meta_func[0]).size.should == 34
+    @record.select_records(meta_func[1]).size.should == 33
+    @record.select_records(meta_func[2]).size.should == 33
+  end
+
+  it 'can update record' do
+    insert_records
+    @record.update_record(7,sample_data)
+    record_equal @record.read_record(7), sample_data
+  end
+
+  def insert_records data_gen=lambda{|x| x}
+    (0...100).each do |i|
+      data = sample_data
+      data[0] = data_gen[i]
+      @record.insert_record data
     end
   end
 
