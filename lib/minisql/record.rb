@@ -106,30 +106,6 @@ module MiniSQL
 
     protected
 
-    def all_records
-      all_blocks do |block,i|
-        records_in_block(block, i) do |item,j|
-          yield item, i*records_per_block+j
-        end
-      end
-    end
-
-    def all_blocks
-      blocks_num = size / records_per_block
-      (0...blocks_num).each do |i|
-        yield buffer.get_block(i), i
-      end
-    end
-
-    def records_in_block block, block_no
-      records_num = [size-block_no*records_per_block, records_per_block].min
-      (0...records_num).each do |i|
-        data = block[i*record_size, record_size]
-        item = deserialize data
-        yield item, i
-      end
-    end
-
     attr_reader :pack_string, :records_per_block, :block_size
     attr_reader :buffer, :table
 
@@ -156,7 +132,7 @@ module MiniSQL
       buffer.set_block(block_number, block)
     end
 
-   def get_pack_string
+    def get_pack_string
       rst = ''
       @columns.each do |col|
         rst <<
@@ -167,6 +143,30 @@ module MiniSQL
         end
       end
       rst
+    end
+
+    def all_records
+      all_blocks do |block,i|
+        records_in_block(block, i) do |item,j|
+          yield item, i*records_per_block+j
+        end
+      end
+    end
+
+    def all_blocks
+      blocks_num = size / records_per_block
+      (0...blocks_num).each do |i|
+        yield buffer.get_block(i), i
+      end
+    end
+
+    def records_in_block block, block_no
+      records_num = [size-block_no*records_per_block, records_per_block].min
+      (0...records_num).each do |i|
+        data = block[i*record_size, record_size]
+        item = deserialize data
+        yield item, i
+      end
     end
 
   end
