@@ -74,10 +74,10 @@ module MiniSQL::DSL
       raise "table #{@name} doesn't set primary key" if @pk.nil?
       sql = "CREATE TABLE #{@name} ( "
       @columns.each do |c|
-        sql += c.dump+", "
+        sql << c.dump+", "
       end
-      sql += "PRIMARY KEY ( #{@pk} )"
-      sql += " );"
+      sql << "PRIMARY KEY ( #{@pk} )"
+      sql << " );"
       sql
     end
 

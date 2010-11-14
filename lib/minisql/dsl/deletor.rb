@@ -13,8 +13,8 @@ module MiniSQL::DSL
 
     def dump
       sql = "DELETE FROM #{@table}"
-      sql += ' ' + @where.dump unless @where.nil?
-      sql += ' ;'
+      sql << ' ' + @where.dump unless @where.nil?
+      sql << ' ;'
     end
 
   end

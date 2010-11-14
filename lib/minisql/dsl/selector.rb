@@ -35,8 +35,8 @@ module MiniSQL::DSL
       raise 'missing from clause' if @from.nil?
       raise 'columns not defined' if @columns.empty?
       sql = 'SELECT ' + @columns.join(', ') + " FROM #{@from}"
-      sql += ' ' + @where.dump unless @where.nil?
-      sql += ' ;'
+      sql << ' ' + @where.dump unless @where.nil?
+      sql << ' ;'
       sql
     end
 
