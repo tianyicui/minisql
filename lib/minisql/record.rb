@@ -54,8 +54,15 @@ module MiniSQL
         where.each do |w|
           v0 = l[col_name_to_num(w[1])]
           v1 = w[2]
-          exp = "#{v0.inspect}#{w[0]}#{v1.inspect}"
-          return false unless eval(exp)
+          return false unless
+            case w[0]
+            when :== then v0==v1
+            when :< then v0<v1
+            when :<= then v0<=v1
+            when :>= then v0>=v1
+            when :> then v0>v1
+            when :"!=" then v0!=v1
+            end
         end
         true
       end
