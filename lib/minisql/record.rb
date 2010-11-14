@@ -49,8 +49,16 @@ module MiniSQL
     end
 
     def where_functor where
-      return lambda {|x| true}# if where==nil
-      raise "Not implemented"
+      return lambda {|x| true} if where==nil
+      lambda do |l|
+        where.each do |w|
+          v0 = l[col_name_to_num(w[1])]
+          v1 = w[2]
+          exp = "#{v0.inspect}#{w[0]}#{v1.inspect}"
+          return false unless eval(exp)
+        end
+        true
+      end
     end
 
     def serialize item

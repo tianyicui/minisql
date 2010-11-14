@@ -105,11 +105,13 @@ describe MiniSQL::Database do
 
   it 'can delete specified data from table' do
     insert_sample_data
-    insert_sample_data [0, 1.0, 'another one']
+    insert_sample_data [0, 1.0, 'another one     ']
     @db.delete_from :tbl do
       column[:int_col] < 1
     end
-    @db.select['*'].from(:tbl).to_a.should == [sample_data]
+    result = @db.select['*'].from(:tbl).to_a
+    result.size.should == 1
+    record_equal result[0], sample_data
   end
 
 end
