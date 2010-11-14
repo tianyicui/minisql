@@ -47,13 +47,19 @@ describe MiniSQL::Database do
   it 'can select * from table' do
     create_sample_table
     @db.select['*'].from(:tbl).to_a.should == []
-    @db.select['*'].from(sqlite_meta_table).to_a[0].should include('tbl')
+    @db.insert_into :tbl, sample_data
+    result = @db.select['*'].from(:tbl).to_a
+    result.size.should == 1
+    record_equal result[0], sample_data
   end
 
   it 'can select columns from table' do
     create_sample_table
     @db.select[:int_col, :float_col].from(:tbl).to_a.should == []
-    @db.select[:type, :name].from(sqlite_meta_table).to_a.should include(['table', 'tbl'])
+    @db.insert_into :tbl, sample_data
+    result = @db.select[:int_col, :float_col].from(:tbl).to_a
+    result.size.should == 1
+    record_equal result[0], [42, 2.17]
   end
 
   it 'can select from table where ...' do
@@ -71,10 +77,10 @@ describe MiniSQL::Database do
       column[:char_col] != 'abc'
     end.to_a.should == []
 
-    @db.select[:type, :name].from(sqlite_meta_table).where do
-      column[:type] == 'table'
-      column[:name] == 'tbl'
-    end.to_a.should == [['table', 'tbl']]
+#    @db.select[:type, :name].from(sqlite_meta_table).where do
+#      column[:type] == 'table'
+#      column[:name] == 'tbl'
+#    end.to_a.should == [['table', 'tbl']]
   end
 
   it 'can create and drop index on table' do

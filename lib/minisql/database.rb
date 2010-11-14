@@ -26,7 +26,11 @@ module MiniSQL
       end
 
       def select info
-        records[info[:table]].select(info)
+        records[info[:table]].select(info[:columns], info[:where])
+      end
+
+      def insert_into info
+        records[info[:table]].insert_record(info[:values])
       end
 
       def execute info

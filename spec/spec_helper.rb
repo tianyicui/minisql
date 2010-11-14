@@ -50,13 +50,13 @@ module SpecHelperMethods
   def insert_sample_data data=nil
     create_sample_table unless @db.tables.include? :tbl
     data = sample_data if data.nil?
-    @db.eval do
-      insert_into :tbl, data
-      select['*'].from(:tbl).where do
-        column[:int_col] == data[0]
-        column[:float_col] == data[1]
-        column[:char_col] == data[2]
-      end.to_a.should == [data]
+    @db.insert_into :tbl, data
+    @db.select['*'].from(:tbl).where do
+      column[:int_col] == data[0]
+      column[:float_col] == data[1]
+      column[:char_col] == data[2]
+    end.each do |item|
+      record_equal item, data
     end
   end
 
@@ -77,12 +77,15 @@ module SpecHelperMethods
     '/tmp/database.db'
   end
 
-  def sqlite_meta_table
-    'sqlite_master'
-  end
-
   def new_buffer file=nil
     MiniSQL::Buffer.new(file || new_tmp_file, block_size)
+  end
+
+  def record_equal data, origin=nil
+    origin = sample_data unless origin
+    data[1].should be_close(origin[1],0.0001)
+    data[1] = origin[1]
+    data.should == origin
   end
 
 end

@@ -20,6 +20,22 @@ module MiniSQL
 
     attr_reader :record_size
 
+    def select columns, where
+      mapper = column_selector(columns)
+      selector = where_functor(where)
+      select_records(selector).map(&mapper)
+    end
+
+    def column_selector columns
+      return lambda {|x| x}# if columns == :*
+      raise "Not implemented"
+    end
+
+    def where_functor where
+      return lambda {|x| true}# if where==nil
+      raise "Not implemented"
+    end
+
     def serialize item
       item.pack(pack_string)
     end
@@ -78,7 +94,7 @@ module MiniSQL
     def select_records func
       rst = []
       all_records do |item,_|
-          rst << item if func[item]
+        rst << item if func[item]
       end
       rst
     end
@@ -154,7 +170,7 @@ module MiniSQL
     end
 
     def all_blocks
-      blocks_num = size / records_per_block
+      blocks_num = size / records_per_block + 1
       (0...blocks_num).each do |i|
         yield buffer.get_block(i), i
       end

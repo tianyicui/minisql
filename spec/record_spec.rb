@@ -88,13 +88,6 @@ describe MiniSQL::Record do
     end
   end
 
-  def record_equal data, origin=nil
-    origin = sample_data unless origin
-    data[1].should be_close(origin[1],0.0001)
-    data[1] = origin[1]
-    data.should == origin
-  end
-
   def block_size
     123
   end
