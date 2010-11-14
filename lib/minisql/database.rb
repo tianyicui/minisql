@@ -2,7 +2,6 @@ module MiniSQL
 
   class Database
 
-    require 'sqlite3'
     require 'minisql/catalog'
     require 'minisql/parser'
 
@@ -21,8 +20,11 @@ module MiniSQL
         end
       end
 
+      attr_reader :catalog
+
       def create_table info
         add_record info[:name]
+        []
       end
 
       def select info
@@ -31,10 +33,12 @@ module MiniSQL
 
       def insert_into info
         records[info[:table]].insert_record(info[:values])
+        []
       end
 
       def delete_from info
         records[info[:table]].delete_from(info[:where])
+        []
       end
 
       def execute info
@@ -45,7 +49,7 @@ module MiniSQL
 
       protected
 
-      attr_reader :catalog, :records, :root
+      attr_reader :records, :root
 
       def add_record table
         records[table] = get_record(table)
@@ -67,7 +71,6 @@ module MiniSQL
       @catalog = Catalog.new filename
       @records = Records.new filename, @catalog
       @parser = SQLParser.new
-      @sqlite = SQLite3::Database.new filename+'/.sqlite'
     end
 
     attr_reader :catalog
@@ -84,7 +87,6 @@ module MiniSQL
       schema.instance_eval(&block)
       command = schema.dump
       execute command
-      command # return the DDL
     end
 
     def drop_table table
@@ -133,21 +135,13 @@ module MiniSQL
     end
 
     def execute command
-      sqlite_result = @sqlite.execute command
       hash = @parser.parse(command).compile
       @catalog.execute hash
-      my_result = @records.execute hash
-      require 'rspec'
-      sqlite_result.to_a.should == my_result
-      my_result
+      @records.execute hash
     end
 
     def tables
       @catalog.tables
-    end
-
-    def close
-      @sqlite.close
     end
 
     def eval &block

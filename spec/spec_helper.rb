@@ -6,7 +6,7 @@ require 'rspec'
 module SpecHelperMethods
 
   def init_db
-    @db = MiniSQL::Database.new new_tmp_file
+    @db = TestDB.new new_tmp_file
   end
 
   def clean_db
@@ -14,14 +14,16 @@ module SpecHelperMethods
   end
 
   def create_sample_table
-    ddl = @db.create_table :tbl do
+    @db.create_table :tbl do
       column[:int_col].int
       column[:float_col].float
       column[:char_col].char(16).unique
       primary_key :int_col
     end
 
-    ddl.split.should == sample_table_ddl.split
+    info = @db.catalog.table_info(:tbl)
+    info.should == sample_table_info
+
     @db.tables.should include :tbl
   end
 
@@ -86,6 +88,33 @@ module SpecHelperMethods
     data[1].should be_close(origin[1],0.0001)
     data[1] = origin[1]
     data.should == origin
+  end
+
+end
+
+require 'minisql'
+
+class TestDB < MiniSQL::Database
+
+  include SpecHelperMethods
+  include RSpec::Matchers
+
+  def initialize filename
+    super(filename)
+    require 'sqlite3'
+    @sqlite = SQLite3::Database.new filename+'/.sqlite'
+  end
+
+  def execute command
+    sqlite_result = @sqlite.execute(command).to_a
+    my_result = super(command)
+    sqlite_result.each_with_index do |v,i|
+      record_equal v, my_result[i]
+    end
+  end
+
+  def close
+    @sqlite.close
   end
 
 end

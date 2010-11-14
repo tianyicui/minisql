@@ -76,11 +76,6 @@ describe MiniSQL::Database do
       column[:float_col] <= 1
       column[:char_col] != 'abc'
     end.to_a.should == []
-
-#    @db.select[:type, :name].from(sqlite_meta_table).where do
-#      column[:type] == 'table'
-#      column[:name] == 'tbl'
-#    end.to_a.should == [['table', 'tbl']]
   end
 
   it 'can create and drop index on table' do
