@@ -77,7 +77,7 @@ describe MiniSQL::Buffer do
     result
   end
 
- def block_size
+  def block_size
     64
   end
 

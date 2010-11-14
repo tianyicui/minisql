@@ -55,12 +55,17 @@ module MiniSQL
     def initialize file, block_size = nil
       super(file, block_size)
       @cache = {}
-      @queue = []
+      @list = []
     end
 
     def get_block num
-      return @cache[num] if @cache.has_key?(num)
-      add_cache(num, super(num))
+      if @cache.has_key?(num)
+        @list.delete(num)
+        @list.unshift(num)
+        @cache[num]
+      else
+        add_cache(num, super(num))
+      end
     end
 
     def set_block num, content
@@ -71,9 +76,9 @@ module MiniSQL
     protected
 
     def add_cache num, content
-      @queue << num
-      if @queue.size >= CACHED_PAGES
-        @cache.delete(@queue.shift)
+      @list << num
+      if @list.size >= CACHED_PAGES
+        @cache.delete(@list.shift)
       end
       @cache[num] = content
     end
