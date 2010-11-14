@@ -66,11 +66,18 @@ module MiniSQL
     end
 
     def delete_records cond
+      all_records do |item, i|
+        while cond[item]
+          delete_record(i)
+          break if i == size
+          item = read_record(i)
+        end
+      end
     end
 
     def select_records func
       rst = []
-      all_records do |item|
+      all_records do |item,_|
           rst << item if func[item]
       end
       rst
@@ -101,8 +108,8 @@ module MiniSQL
 
     def all_records
       all_blocks do |block,i|
-        records_in_block(block, i) do |item,_|
-          yield item
+        records_in_block(block, i) do |item,j|
+          yield item, i*records_per_block+j
         end
       end
     end

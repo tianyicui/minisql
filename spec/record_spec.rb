@@ -54,7 +54,7 @@ describe MiniSQL::Record do
     func = lambda {|i| i[0]%3==0}
     @record.delete_records func
     @record.select_records(func).size.should == 0
-    @records.size.should == 66
+    @record.size.should == 66
   end
 
   it 'can select records' do
