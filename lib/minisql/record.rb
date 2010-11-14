@@ -65,28 +65,63 @@ module MiniSQL
       write_data data, num
     end
 
+    def delete_records cond
+    end
+
+    def select_records func
+      rst = []
+      all_records do |item|
+          rst << item if func[item]
+      end
+      rst
+    end
+
     def update_record num, item
       raise "No such record: ##{num}" unless 0 <= num && num < size
       data = serialize item
       write_data data, num
     end
 
-    def select_records func
-      rst = []
-      blocks_num = size / records_per_block
-      (0...blocks_num).each do |i|
-         block = buffer.get_block(i)
-         records_num = [size-i*records_per_block, records_per_block].min
-         (0...records_num).each do |j|
-           data = block[j*record_size, record_size]
-           item = deserialize data
-           rst << item if func[item]
-         end
+    def update_records cond, trans
+      all_blocks do |block, i|
+        changed = false
+        records_in_block(block, i) do |item, j|
+          if cond(item)
+            item = trans(item)
+            data = serialize item
+            block[j*records_size, record_size] = data
+            changed = true
+          end
+        end
+        buffer.set_block(i, block) if changed
       end
-      rst
     end
 
     protected
+
+    def all_records
+      all_blocks do |block,i|
+        records_in_block(block, i) do |item,_|
+          yield item
+        end
+      end
+    end
+
+    def all_blocks
+      blocks_num = size / records_per_block
+      (0...blocks_num).each do |i|
+        yield buffer.get_block(i), i
+      end
+    end
+
+    def records_in_block block, block_no
+      records_num = [size-block_no*records_per_block, records_per_block].min
+      (0...records_num).each do |i|
+        data = block[i*record_size, record_size]
+        item = deserialize data
+        yield item, i
+      end
+    end
 
     attr_reader :pack_string, :records_per_block, :block_size
     attr_reader :buffer, :table
