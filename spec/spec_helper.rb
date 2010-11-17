@@ -85,7 +85,7 @@ module SpecHelperMethods
 
   def record_equal data, origin=nil
     origin = sample_data unless origin
-    data[1].should be_close(origin[1],0.0001)
+    data[1].should be_within(0.0001).of(origin[1])
     data[1] = origin[1]
     data.should == origin
   end
